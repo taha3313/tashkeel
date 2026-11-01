@@ -5,14 +5,22 @@
   <title>تشكيل | تشكيل النصوص العربية ومستندات Word</title>
   <meta name="description" content="أضف التشكيل إلى النصوص العربية أو ارفع مستند Word وحمّل نسخة مشكّلة مع الحفاظ على التنسيق.">
   <meta name="theme-color" content="#f5f1e8">
+  <script src="/static/theme.js?v=dark-mode-1"></script>
   <link rel="preload" href="/static/fonts/amiri-arabic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/static/style.css?v=arabic-desk-1"><script src="/static/app.js?v=arabic-desk-1" defer></script>
+  <link rel="stylesheet" href="/static/style.css?v=dark-mode-1"><script src="/static/app.js?v=arabic-desk-1" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">انتقل إلى مساحة الكتابة</a>
 <header class="container masthead">
   <div class="identity"><a href="/" class="brand" aria-label="تشكيل، الصفحة الرئيسية">تَشْكِيل</a><span class="brand-description">للنصوص العربية<br>ومستندات Word</span></div>
-  <a href="https://tahachelly.com" class="author" dir="ltr">Taha Chelly</a>
+  <div class="masthead-actions">
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-pressed="false" title="الوضع الداكن" hidden>
+      <svg class="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 13A8.5 8.5 0 0 1 11 3.5 8.5 8.5 0 1 0 20.5 13Z"/></svg>
+      <svg class="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg>
+      <span class="theme-label">الوضع الداكن</span>
+    </button>
+    <a href="https://tahachelly.com" class="author" dir="ltr">Taha Chelly</a>
+  </div>
 </header>
 <main class="container" id="main">
   <div class="intro"><h1>لكلِّ حرفٍ حركتُه.</h1><p>اكتب نصّك أو ارفع مستند Word، وأضف إليه التشكيل.</p></div>

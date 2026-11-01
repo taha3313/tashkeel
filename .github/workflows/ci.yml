@@ -11,3 +11,4 @@ jobs:
       - run: uv sync --frozen
       - run: uv run pytest
       - run: node --check static/app.js
+      - run: node --check static/theme.js
