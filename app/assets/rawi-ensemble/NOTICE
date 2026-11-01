@@ -1,0 +1,5 @@
+Rawi Ensemble model by TigreGotico.
+Rawi V2/V3 training compute provided by Mike Hansen.
+Source: https://huggingface.co/TigreGotico/rawi-ensemble
+Model card declares Apache-2.0. See LICENSE.
+The application uses an independent source-preserving Python adapter.

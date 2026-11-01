@@ -2,7 +2,7 @@ FROM python:3.12-slim
 WORKDIR /app
 RUN pip install --no-cache-dir uv==0.9.0
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-install-project
+RUN UV_HTTP_TIMEOUT=180 uv sync --frozen --no-dev --no-install-project
 COPY app ./app
 COPY static ./static
 RUN useradd --uid 10001 --create-home tashkeel

@@ -1,0 +1,26 @@
+{
+  "repository": "https://huggingface.co/TigreGotico/rawi-ensemble",
+  "revision": "de3fca3a2f24cf7315a955ba09f73def025209d8",
+  "license": "Apache-2.0 declared by upstream model card",
+  "model_source": "rawi_ensemble.onnx",
+  "precision": "FP32",
+  "adapter": "NFD character tokenizer; ordinary-harakat output only on original Arabic letters; preserves all original characters and supplied marks. No spelling restoration.",
+  "files": {
+    "vocab.json": {
+      "bytes": 3334,
+      "sha256": "5a8972bc1c5985092973d543d8b04f4c9317b2d11625c242420baf69bb4bf037"
+    },
+    "model.onnx": {
+      "bytes": 19501886,
+      "sha256": "3add2657fd5aa9bd0cda9943fef7f3f74a29324f3e7f07ad353f01d6d0e56dfc"
+    },
+    "LICENSE": {
+      "bytes": 11666,
+      "sha256": "77e814f64be28f46acd9979bb32e6ef82ef240671b7e216260b467fd405225bf"
+    },
+    "NOTICE": {
+      "bytes": 261,
+      "sha256": "840a2e85363d28e0447f805f01b6f69236b2daebd55a0cb4206eee41d2b572a0"
+    }
+  }
+}

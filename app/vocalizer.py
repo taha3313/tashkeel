@@ -1,11 +1,12 @@
-"""CPU-only adapter for libtashkeel's bundled ONNX model (MIT licensed).
+"""CPU-only, source-preserving adapter for bundled Rawi Ensemble FP32 ONNX.
 
-Token/hint layout follows mush42/libtashkeel, pinned in assets/PROVENANCE.json.
-No network downloads, PyTorch, GPU libraries or meter-guided vowel search.
+Upstream checkpoint and Apache-2.0 declaration are pinned in PROVENANCE.json.
+No runtime downloads, spelling changes, PyTorch or GPU libraries.
 """
 
 import json
 import re
+import unicodedata
 from pathlib import Path
 from threading import Lock
 
@@ -20,7 +21,7 @@ ORT_ERRORS = (
     ort.capi.onnxruntime_pybind11_state.RuntimeException,
 )
 
-ASSETS = Path(__file__).resolve().parent / "assets/libtashkeel"
+ASSETS = Path(__file__).resolve().parent / "assets/rawi-ensemble"
 MARKS = frozenset("ًٌٍَُِّْ")
 ARABIC_LETTER = re.compile(r"[ء-غف-ي]")
 
@@ -58,12 +59,12 @@ def merge_marks(existing: str, predicted: str) -> str:
 class Vocalizer:
     def __init__(self):
         try:
-            self.input_ids = json.loads((ASSETS / "input_id_map.json").read_text())
-            self.hint_ids = json.loads((ASSETS / "hint_id_map.json").read_text())
+            vocab = json.loads((ASSETS / "vocab.json").read_text())
+            self.input_ids = vocab["char_to_idx"]
+            self.unknown_id = self.input_ids.get("<UNK>", 1)
             self.target_marks = {
-                value: key
-                for key, value in json.loads((ASSETS / "target_id_map.json").read_text()).items()
-                if key != "_"
+                value: "".join(mark for mark in key if mark in MARKS)
+                for key, value in vocab["diac_to_idx"].items()
             }
             options = ort.SessionOptions()
             options.intra_op_num_threads = 1
@@ -75,43 +76,40 @@ class Vocalizer:
                 sess_options=options,
                 providers=["CPUExecutionProvider"],
             )
-        except (OSError, ValueError, RuntimeError, *ORT_ERRORS) as exc:
+        except (OSError, ValueError, KeyError, RuntimeError, *ORT_ERRORS) as exc:
             raise TashkeelUnavailable("تعذّر تحميل نموذج التشكيل المحلي.") from exc
-        # Serialize inference to bound concurrent workspace memory on 512 MB hosts.
         self.lock = Lock()
 
     def complete(self, text: str) -> str:
         slots = split_marks(text)
-        chars, hints, positions = [], [], []
-        for index, (char, marks) in enumerate(slots):
-            token = "#" if char.isdigit() else char
-            if token not in self.input_ids:
-                continue
-            chars.append(self.input_ids[token])
-            hints.append(self.hint_ids.get(normalize_marks(marks), 1))
-            positions.append(index)
-        if not chars:
+        chars, positions = [], []
+        for index, (char, _) in enumerate(slots):
+            # Rawi predicts rich NFD classes, including spelling-restoration marks.
+            # Decompose only for inference; output always uses original characters.
+            for token in unicodedata.normalize("NFD", char):
+                if unicodedata.category(token) == "Mn":
+                    continue
+                chars.append(self.input_ids.get(token, self.unknown_id))
+                positions.append(index)
+        if not chars or not any(ARABIC_LETTER.fullmatch(c) for c, _ in slots):
             return text
         if len(chars) > 480:
             raise TashkeelUnavailable("النص أطول من الحد المتاح للتشكيل المحلي.")
-        feed = {
-            "char_inputs": np.array([chars], dtype=np.int64),
-            "diac_inputs": np.array([hints], dtype=np.int64),
-            "input_lengths": np.array([len(chars)], dtype=np.int64),
-        }
         try:
             with self.lock:
-                predictions = self.session.run(None, feed)[0].reshape(-1)
+                predictions = self.session.run(
+                    ["gated_cls"], {"input": np.array([chars], dtype=np.int64)}
+                )[0].reshape(-1)
             if len(predictions) != len(positions):
                 raise ValueError("Prediction length mismatch")
             output = list(slots)
             for index, prediction in zip(positions, predictions, strict=True):
                 char, existing = slots[index]
                 if ARABIC_LETTER.fullmatch(char):
-                    predicted = self.target_marks.get(int(prediction), "")
+                    predicted = self.target_marks[int(prediction)]
                     output[index] = (char, merge_marks(existing, predicted))
             return "".join(char + marks for char, marks in output)
-        except (RuntimeError, ValueError, *ORT_ERRORS) as exc:
+        except (RuntimeError, ValueError, KeyError, *ORT_ERRORS) as exc:
             raise TashkeelUnavailable(
                 "تعذّر إكمال التشكيل المحلي. يمكنك تعطيله وفحص النص الأصلي."
             ) from exc
