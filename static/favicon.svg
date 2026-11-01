@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>تشكيل</title>
+  <rect width="64" height="64" rx="14" fill="#8c482b"/>
+  <path d="M14 32c-2 10 2 16 16 16 13 0 20-5 20-16" stroke="#fffcf5" stroke-width="5.5" stroke-linecap="round"/>
+  <path d="m27 14 13-4" stroke="#e6a47b" stroke-width="4" stroke-linecap="round"/>
+  <path d="m25 24 3-3 3 3-3 3Zm11 0 3-3 3 3-3 3Z" fill="#fffcf5"/>
+</svg>
