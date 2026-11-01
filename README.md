@@ -27,3 +27,5 @@ Dedicated Render Docker web service, Frankfurt, one worker. Startup binds `0.0.0
 ## Model provenance
 
 The ONNX model and character maps come from [mush42/libtashkeel](https://github.com/mush42/libtashkeel), revision `9b91c2dbc3dc4085dc4f77a9e250e5dd095d7d0c`, under the bundled MIT license. See `app/assets/libtashkeel/PROVENANCE.json`. The Python adapter was extracted from Taha Chelly's Qafiya project. IBM Plex Sans Arabic is bundled with its font license.
+
+The public domain is https://tashkeel.tahachelly.com. Render service: https://tashkeel.onrender.com ([dashboard](https://dashboard.render.com/web/srv-dbjna4rbc2fs73db7v40)). Cloudflare Worker `tashkeel-proxy` supplies the public domain and TLS and streams requests to Render; all application code, file processing, and inference run on this separate Render service. Gateway source is in `cloudflare/worker.mjs`. Manual Render deploys are enabled; deploy only a tested commit.
