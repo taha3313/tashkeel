@@ -1,0 +1,29 @@
+{
+  "repository": "https://github.com/mush42/libtashkeel",
+  "revision": "9b91c2dbc3dc4085dc4f77a9e250e5dd095d7d0c",
+  "license": "MIT (LICENSE included)",
+  "model_source": "crates/core/data/ort/model.onnx",
+  "adapter": "Python/NumPy CPU adapter for upstream ONNX char, hint and length inputs; preserves original text and supplied vowels. Not the Rust bindings.",
+  "files": {
+    "hint_id_map.json": {
+      "bytes": 193,
+      "sha256": "80931db53b1f1031609a66f23b64a1c37d79ae4a8a4c785023728636a7fa93e5"
+    },
+    "input_id_map.json": {
+      "bytes": 628,
+      "sha256": "727a49aa3c7e939dc06f32b27c2e06c4c4bbef596dce4bf51276261ca736c3c3"
+    },
+    "target_id_map.json": {
+      "bytes": 181,
+      "sha256": "6da34024bfd4c0ff54f7598bb74d5a00405144d746afe72c141fceeaba21ed30"
+    },
+    "model.onnx": {
+      "bytes": 4788213,
+      "sha256": "52c40d42ca094ff9ff07a091d0a1eafd7baa5cf2388e60a9cc89bacd8e5e955f"
+    },
+    "LICENSE": {
+      "bytes": 1066,
+      "sha256": "98dbc9a6a01badb391f2b64161742cb9cd8fcdc5cfc97486be0d49c47e98d1a8"
+    }
+  }
+}

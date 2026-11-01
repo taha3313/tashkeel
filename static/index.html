@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تشكيل | تشكيل النصوص العربية ومستندات Word</title><meta name="description" content="أضف التشكيل إلى النصوص العربية أو ارفع مستند Word وحمّل نسخة مشكّلة مع الحفاظ على التنسيق."><link rel="stylesheet" href="/static/style.css"><script src="/static/app.js" defer></script></head>
+<body>
+<header><a href="/" class="brand">تشكيل</a><span>للنصوص العربية ومستندات Word</span><a href="https://tahachelly.com" class="author">Taha Chelly</a></header>
+<main>
+<div class="intro"><h1>لكلِّ حرفٍ حركتُه.</h1><p>اكتب نصّك أو ارفع مستند Word، وأضف إليه التشكيل.</p></div>
+<nav class="tabs" aria-label="طريقة إدخال النص"><button id="text-tab" type="button" aria-pressed="true">كتابة نص</button><button id="word-tab" type="button" aria-pressed="false">مستند Word</button></nav>
+<section id="text-panel" aria-labelledby="text-tab">
+<form id="text-form">
+<div class="editor-head"><label for="input">النص الأصلي</label><button id="sample" type="button">جرّب مثالًا</button></div>
+<textarea id="input" maxlength="20000" rows="7" placeholder="اكتب أو الصق النص العربي هنا…" required></textarea>
+<div class="toolbar"><span id="count">٠ / ٢٠٬٠٠٠ حرف</span><button class="primary" id="submit-text" type="submit">شكّل النص</button></div>
+</form>
+<div id="result-section" hidden><div class="editor-head"><label for="output">النص المشكّل</label><div class="actions"><button id="copy" type="button">نسخ</button><button id="download-text" type="button">تحميل النص</button></div></div><textarea id="output" rows="7" aria-label="النص المشكّل، قابل للتحرير"></textarea></div>
+</section>
+<section id="word-panel" aria-labelledby="word-tab" hidden>
+<form id="word-form"><label class="upload" for="document"><strong>اختر مستند Word</strong><span>صيغة .docx، حتى ٥ ميغابايت</span><input id="document" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required></label>
+<p class="help">حتى ٢٠٬٠٠٠ حرف داخل المستند. نحتفظ بالتنسيق والجداول والصور. لملفات .doc القديمة، احفظ نسخة بصيغة .docx أولًا.</p><div class="toolbar"><span id="filename">لم يتم اختيار ملف</span><button class="primary" id="submit-word" type="submit">شكّل المستند</button></div></form>
+<a id="download-word" class="download" hidden>تحميل المستند المشكّل</a>
+</section>
+<p id="status" role="status" aria-live="polite"></p><p id="error" role="alert" hidden></p>
+<aside>التشكيل آلي وقد يخطئ؛ راجع النتيجة، خاصةً أواخر الكلمات والأسماء. تُعالج النصوص على الخادم ولا يحفظها التطبيق.</aside>
+<noscript>يلزم تفعيل JavaScript لاستخدام أداة التشكيل.</noscript>
+</main>
+<footer><span>تشكيل، أداة مستقلة من Taha Chelly</span><a href="https://github.com/taha3313/tashkeel">المصدر</a><a href="/static/model-license.txt">ترخيص نموذج libtashkeel</a></footer>
+</body></html>
