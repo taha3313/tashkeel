@@ -1,0 +1,17 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: clip; }
+html { scrollbar-color: var(--muted) var(--paper); }
+body { margin: 0; background: var(--paper); color: var(--ink); font: var(--text-md)/1.8 var(--font); -webkit-font-smoothing: antialiased; caret-color: var(--accent); font-synthesis: none; }
+a { color: inherit; text-underline-offset: 5px; }
+button, input, textarea { font: inherit; }
+button, a, input { touch-action: manipulation; }
+h1, h2, h3 { margin: 0; font-weight: 400; min-width: 0; overflow-wrap: break-word; text-wrap: balance; }
+p { margin: 0; text-wrap: pretty; }
+svg { display: block; flex-shrink: 0; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; }
+[hidden] { display: none !important; }
+::selection { background: var(--wash); color: var(--ink); }
+.container { width: 100%; max-width: var(--container); margin-inline: auto; padding-inline: var(--gutter); }
+@media (max-width: 48rem) { :root { --gutter: 24px; --gap-columns: 24px; } }
+@media (max-width: 30rem) { :root { --gutter: 16px; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
