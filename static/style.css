@@ -4,8 +4,8 @@
  * axes: light/roman-serif/warm · posture: restrained · brand: source palette · v2.0.0 */
 /* Hallmark · finish-review: subagent · ship · 0 actionable findings · old example button was more explicit, current control retains its visible label */
 /* Hallmark · pre-emit critique: P4 H5 E4 S5 R4 V4 · weakest: R, kept the Arabic letter specimen only in the useful empty result state */
-@import url('./tokens.css');
-@import url('./base.css');
+@import url('./tokens.css?v=arabic-desk-1');
+@import url('./base.css?v=arabic-desk-1');
 @font-face { font-family: 'Plex Arabic'; src: url('/static/fonts/arabic.woff2') format('woff2'); font-display: swap; font-weight: 400; }
 @font-face { font-family: 'Amiri'; src: url('/static/fonts/amiri-arabic.woff2') format('woff2'); font-display: swap; font-weight: 400; }
 button, a { -webkit-tap-highlight-color: var(--wash); }
