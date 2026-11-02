@@ -1,9 +1,10 @@
 """Change text nodes only: retain runs, tables, links, images, and section formatting."""
 from io import BytesIO
 import re
+import unicodedata
 from zipfile import BadZipFile, ZipFile
 from lxml import etree
-from app.vocalizer import split_marks
+from app.vocalizer import MAX_INPUT_TOKENS, split_marks
 
 MAX_TEXT = 20_000
 MAX_FILE = 5 * 1024 * 1024
@@ -12,12 +13,22 @@ PART = re.compile(r'word/(document|header\d+|footer\d+|footnotes|endnotes)\.xml$
 ARABIC = re.compile(r'[ء-غف-ي]')
 
 
-def chunks(text, limit=360):
+def chunks(text, limit=MAX_INPUT_TOKENS):
     """Split at whitespace when possible without dropping any input characters."""
     slots = split_marks(text)
     start = 0
     while start < len(slots):
-        end = min(start + limit, len(slots))
+        # Match the model's NFD token budget, including mixed-script text.
+        end, tokens = start, 0
+        while end < len(slots):
+            cost = sum(unicodedata.category(c) != 'Mn'
+                       for c in unicodedata.normalize('NFD', slots[end][0]))
+            if tokens + cost > limit:
+                break
+            tokens += cost
+            end += 1
+        if end == start:
+            raise ValueError('Chunk limit is smaller than one source character.')
         if end < len(slots):
             boundary = next((i + 1 for i in range(end - 1, start, -1)
                              if slots[i][0].isspace() or slots[i][0] in '.!?؟؛،'), None)
