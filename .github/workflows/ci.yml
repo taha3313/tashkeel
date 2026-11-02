@@ -13,3 +13,4 @@ jobs:
       - run: node --check static/app.js
       - run: node --check static/theme.js
       - run: python cloudflare/build.py && node --test cloudflare/worker.test.mjs
+      - run: uv run python tools/arabic_quality.py evaluate --cases quality/cases.jsonl --split validation --output /tmp/arabic-quality.json --check

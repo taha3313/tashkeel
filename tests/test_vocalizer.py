@@ -66,3 +66,19 @@ def test_long_context_accepts_complete_sentence(model):
     text = ('ذهب الطفل إلى المدرسة. ' * 30).strip()
     result = model.complete(text)
     assert [c for c, _ in split_marks(result)] == [c for c, _ in split_marks(text)]
+
+
+def test_explicit_hamza_below_supplies_kasra_without_overriding_user_marks():
+    from threading import Lock
+    model = object.__new__(Vocalizer)
+    model.input_ids = {'ا': 1}
+    model.unknown_id = 0
+    model.target_marks = {1: 'َ'}
+    model.lock = Lock()
+    class Session:
+        def run(self, names, feed):
+            return [np.array([[1]], dtype=np.int64)]
+    model.session = Session()
+    assert model.complete('إ') == 'إِ'
+    assert model.complete('إَ') == 'إَ'
+    assert model.complete('أ') == 'أَ'

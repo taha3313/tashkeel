@@ -36,3 +36,13 @@ Isolated validation on 180 released-reference paragraphs measured 3.52% DER / 12
 The public domain is https://tashkeel.tahachelly.com. Render service: https://tashkeel.onrender.com ([dashboard](https://dashboard.render.com/web/srv-dbjna4rbc2fs73db7v40)). Cloudflare Worker `tashkeel-proxy` serves the frontend directly, so the page loads even while Render sleeps. Only `/api/*` and `/health` are forwarded to Render. File processing and inference remain on Render. The browser waits for backend readiness before submitting text or a document; it never retries inference submissions automatically. Gateway source is in `cloudflare/worker.mjs`. Manual Render deploys are enabled; deploy only a tested commit.
 
 Build the edge frontend with `python cloudflare/build.py`, then upload `cloudflare/worker.mjs` and `cloudflare/assets.generated.mjs` as ES modules to the existing `tashkeel-proxy` Worker. Rebuild and redeploy the Worker after changing any file in `static/`. The generated module contains public static assets only and is ignored by Git. No Render deployment or DNS change is needed for frontend releases.
+
+## Improving Arabic accuracy
+
+The [offline quality workflow](quality/README.md) freezes error examples, separates
+word-ending and internal-vowel errors, imports Arabic review decisions, and checks
+candidate corrections for both fixes and regressions. Its initial 162-case set
+contains public-reference and provisional original examples; it is not collected
+from website users. See [first findings](quality/INITIAL-FINDINGS.md) and
+[dataset attribution](quality/ATTRIBUTION.md). Training export excludes benchmarks,
+held-out data, and unapproved corrections.

@@ -5,3 +5,4 @@ __pycache__/
 *.docx
 .hallmark/
 cloudflare/assets.generated.mjs
+quality/local/

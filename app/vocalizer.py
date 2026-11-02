@@ -108,6 +108,10 @@ class Vocalizer:
                 char, existing = slots[index]
                 if ARABIC_LETTER.fullmatch(char):
                     predicted = self.target_marks[int(prediction)]
+                    # The explicitly written hamza-below already determines kasra.
+                    # Supplied marks remain authoritative, even if contradictory.
+                    if char == 'إ' and not existing:
+                        predicted = 'ِ'
                     output[index] = (char, merge_marks(existing, predicted))
             return "".join(char + marks for char, marks in output)
         except (RuntimeError, ValueError, KeyError, *ORT_ERRORS) as exc:
