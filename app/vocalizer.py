@@ -22,6 +22,7 @@ ORT_ERRORS = (
 )
 
 ASSETS = Path(__file__).resolve().parent / "assets/rawi-ensemble"
+MAX_INPUT_TOKENS = 1024
 MARKS = frozenset("ًٌٍَُِّْ")
 ARABIC_LETTER = re.compile(r"[ء-غف-ي]")
 
@@ -93,7 +94,7 @@ class Vocalizer:
                 positions.append(index)
         if not chars or not any(ARABIC_LETTER.fullmatch(c) for c, _ in slots):
             return text
-        if len(chars) > 480:
+        if len(chars) > MAX_INPUT_TOKENS:
             raise TashkeelUnavailable("النص أطول من الحد المتاح للتشكيل المحلي.")
         try:
             with self.lock:

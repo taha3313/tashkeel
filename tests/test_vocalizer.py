@@ -4,7 +4,7 @@ import json
 import numpy as np
 import pytest
 
-from app.vocalizer import ASSETS, TashkeelUnavailable, Vocalizer, split_marks
+from app.vocalizer import ASSETS, MAX_INPUT_TOKENS, TashkeelUnavailable, Vocalizer, split_marks
 
 
 @pytest.fixture(scope='module')
@@ -41,7 +41,7 @@ def test_non_arabic_is_unchanged(model):
 
 def test_bounded_model_input(model):
     with pytest.raises(TashkeelUnavailable):
-        model.complete('ع' * 481)
+        model.complete('ع' * (MAX_INPUT_TOKENS + 1))
 
 
 def test_spelling_restoration_is_not_applied():
@@ -60,3 +60,9 @@ def test_spelling_restoration_is_not_applied():
 
     model.session = Session()
     assert model.complete('أ') == 'أَ'
+
+
+def test_long_context_accepts_complete_sentence(model):
+    text = ('ذهب الطفل إلى المدرسة. ' * 30).strip()
+    result = model.complete(text)
+    assert [c for c, _ in split_marks(result)] == [c for c, _ in split_marks(text)]

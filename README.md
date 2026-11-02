@@ -6,7 +6,7 @@ A standalone Arabic vocalization tool by Taha Chelly. Paste Arabic text, or uplo
 - Word upload supports the file picker and drag and drop.
 - Word files retain run formatting, tables, images, hyperlinks, sections, headers, and footers. Footnote and endnote text is processed too. Text inside embedded objects and images is not recognized.
 - Up to 20,000 text characters; `.docx` files up to 5 MB (30 MB expanded). Old `.doc` files must first be saved as `.docx` in Word.
-- Existing vowel marks are respected. Longer passages are split at whitespace or punctuation; context across chunks is limited.
+- Existing vowel marks are respected. Longer passages use up to 1,024 model input tokens per chunk and split at whitespace or punctuation; context across chunks is limited. See [quality follow-up](docs/quality-followup.md) for measured gains and limitations.
 - Automatic diacritization can be wrong, especially names and grammatical endings. Review outputs.
 - Files are processed in memory after the HTTP upload and are not retained by application code. Input/output text is not logged or cached. Hosting infrastructure may retain ordinary request metadata.
 - One inference job at a time; concurrent requests receive a retry message.

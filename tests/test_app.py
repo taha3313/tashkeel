@@ -24,7 +24,7 @@ def mark(text):
 
 def test_chunking_preserves_every_character():
     original = ('اللغة العربية جميلة. \n' * 100) + ('ع' * 800)
-    parts = list(chunks(original))
+    parts = list(chunks(original, limit=360))
     assert ''.join(parts) == original
     assert all(len(p) <= 360 for p in parts)
     assert vocalize('hello\n123', mark) == 'hello\n123'
@@ -77,3 +77,16 @@ def test_api_real_model_and_document_roundtrip():
             assert 'َ' in ''.join(root.itertext())
             assert len(list(root.iter(W + 'b'))) == 1
         assert client.get('/').status_code == 200
+
+
+def test_mixed_script_chunks_respect_model_token_budget():
+    import unicodedata
+    from app.vocalizer import MAX_INPUT_TOKENS, complete_text, split_marks
+    original = ('한글 café أحمد🙂 ' * 100) + 'العربية'
+    parts = list(chunks(original))
+    assert ''.join(parts) == original
+    for part in parts:
+        tokens = [c for c in unicodedata.normalize('NFD', part)
+                  if unicodedata.category(c) != 'Mn']
+        assert len(tokens) <= MAX_INPUT_TOKENS
+        assert [c for c, _ in split_marks(complete_text(part))] == [c for c, _ in split_marks(part)]
