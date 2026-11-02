@@ -143,6 +143,16 @@ def write_jsonl(path, rows):
     Path(path).write_text(''.join(json.dumps(row, ensure_ascii=False) + '\n' for row in rows))
 
 
+
+def write_report(path, report):
+    # Keep per-case records on one line so data changes remain reviewable in Git.
+    summary = {k: v for k, v in report.items() if k != 'details'}
+    prefix = json.dumps(summary, ensure_ascii=False, indent=2).rstrip()[:-1].rstrip()
+    details = ',\n'.join('    ' + json.dumps(row, ensure_ascii=False, separators=(',', ':'))
+                         for row in report.get('details', []))
+    Path(path).write_text(prefix + ',\n  "details": [\n' + details + '\n  ]\n}\n')
+
+
 def baseline_predict(text):
     sys.path.insert(0, str(ROOT))
     from app.documents import vocalize
@@ -402,7 +412,7 @@ def main():
                 predictions = {c['id']: explicit_hamza_kasra(c['input'], predictions[c['id']])
                                for c in cases if c['id'] in predictions}
             result = evaluate(cases, predictions)
-            Path(args.output).write_text(json.dumps(result, ensure_ascii=False, indent=2))
+            write_report(args.output, result)
             print(json.dumps({k: v for k, v in result.items() if k != 'details'}, ensure_ascii=False))
             if args.check and (result['missing'] or result['source_violations'] or result['supplied_mark_violations']
                               or result['outcomes'].get('regressed') or result['scores']['candidate'].get('invalid_marks')):
