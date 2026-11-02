@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.docx
 .hallmark/
+cloudflare/assets.generated.mjs

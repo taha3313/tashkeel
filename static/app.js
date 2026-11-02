@@ -28,7 +28,19 @@ function setBusy(value) {
   $('submit-word').setAttribute('aria-busy', value);
 }
 async function request(path, options) {
-  const response = await fetch(path, { ...options, signal: AbortSignal.timeout(240000) });
+  const signal = AbortSignal.timeout(240000);
+  // Wait for readiness before sending text or uploading a document. Only GETs
+  // are retried; inference submissions are never automatically replayed.
+  const deadline = Date.now() + 180000;
+  while (true) {
+    signal.throwIfAborted();
+    const health = await fetch('/health', {signal, cache: 'no-store'});
+    const body = await health.json().catch(() => null);
+    if (health.ok && body?.status === 'ok') break;
+    if (Date.now() >= deadline) throw new Error('تعذّر تشغيل الخدمة. أعد المحاولة بعد قليل.');
+    await new Promise(resolve => setTimeout(resolve, 3000));
+  }
+  const response = await fetch(path, { ...options, signal });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     throw new Error(typeof body?.detail === 'string' ? body.detail : 'تعذّر إكمال الطلب. راجع حجم النص أو الملف وأعد المحاولة.');
@@ -67,7 +79,7 @@ $('word-form').onsubmit = async event => {
   const file = $('document').files[0];
   if (!file || !/\.docx$/i.test(file.name)) { $('document').setAttribute('aria-invalid', 'true'); fail(new Error('اختر ملف Word بصيغة .docx.')); return; }
   if (file.size > 5 * 1024 * 1024) { $('document').setAttribute('aria-invalid', 'true'); fail(new Error('الحد الأقصى لحجم الملف ٥ ميغابايت.')); return; }
-  setBusy(true); $('status').textContent = 'جارٍ تشكيل المستند… أبقِ هذه الصفحة مفتوحة حتى اكتمال المعالجة.';
+  setBusy(true); $('status').textContent = 'جارٍ تشكيل المستند… قد يستغرق التشغيل الأول نحو دقيقة. أبقِ هذه الصفحة مفتوحة.';
   try {
     const form = new FormData(); form.append('file', file);
     const response = await request('/api/document', {method: 'POST', body: form});
