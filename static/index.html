@@ -10,7 +10,7 @@
   <meta name="theme-color" content="#f5f1e8">
   <script src="/static/theme.js?v=dark-mode-1"></script>
   <link rel="preload" href="/static/fonts/amiri-arabic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="/static/style.css?v=dark-mode-1"><script src="/static/app.js?v=cloudflare-frontend-1" defer></script>
+  <link rel="stylesheet" href="/static/style.css?v=upload-states-1"><script src="/static/app.js?v=upload-states-1" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">انتقل إلى مساحة الكتابة</a>
@@ -49,11 +49,32 @@
       </div>
     </div>
   </section>
-  <section id="word-panel" aria-labelledby="word-tab" hidden>
+  <section id="word-panel" aria-labelledby="word-tab" data-state="empty" hidden>
+    <ol class="word-steps" aria-label="خطوات تشكيل المستند">
+      <li id="step-select" aria-current="step"><span>١</span>اختر المستند</li>
+      <li id="step-process"><span>٢</span>تشكيل المستند</li>
+      <li id="step-download"><span>٣</span>تحميل النتيجة</li>
+    </ol>
     <form id="word-form" class="word-workbench">
-      <div class="upload-pane"><label class="upload" for="document" id="drop-zone"><svg class="document-icon" viewBox="0 0 48 56" aria-hidden="true"><path d="M28 3H8a3 3 0 0 0-3 3v44a3 3 0 0 0 3 3h32a3 3 0 0 0 3-3V18zM28 3v15h15M14 29h20M14 37h16"/></svg><strong>اختر مستند Word</strong><span>أو اسحبه إلى هنا</span><input id="document" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="word-help filename error" required><span class="file-pick">اختيار ملف</span><span class="file-limit">صيغة .docx، حتى ٥ ميغابايت</span></label>
-      <div class="toolbar"><span id="filename">لم يتم اختيار ملف</span><button class="primary" id="submit-word" type="submit"><span>شكّل المستند</span></button></div></div>
-      <div class="document-guidance"><h2>مستندك، بتنسيقه نفسه.</h2><p class="help" id="word-help">حتى ٢٠٬٠٠٠ حرف داخل المستند. نحتفظ بالتنسيق والجداول والصور. لملفات .doc القديمة، احفظ نسخة بصيغة .docx أولًا.</p><p class="document-review">التشكيل آلي وقد يخطئ؛ راجع المستند بعد تحميله.</p><a id="download-word" class="download" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></svg>تحميل المستند المشكّل</a></div>
+      <div class="upload-pane">
+        <label class="upload" for="document" id="drop-zone">
+          <svg class="document-icon" viewBox="0 0 48 56" aria-hidden="true"><path d="M28 3H8a3 3 0 0 0-3 3v44a3 3 0 0 0 3 3h32a3 3 0 0 0 3-3V18zM28 3v15h15M14 29h20M14 37h16"/></svg>
+          <strong id="upload-title">اختر مستند Word</strong><span id="upload-hint">أو اسحبه إلى هنا</span>
+          <input id="document" type="file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" aria-describedby="word-help filename error" required>
+          <span class="file-pick" id="file-pick">اختيار ملف</span><span class="file-limit">صيغة .docx، حتى ٥ ميغابايت</span>
+        </label>
+        <div class="selected-file" id="selected-file" hidden><span class="file-tag" dir="ltr">DOCX</span><div><bdi id="filename">لم يتم اختيار ملف</bdi><span id="file-size"></span></div><span class="selection-note">تم اختيار الملف</span></div>
+        <div class="toolbar word-toolbar"><span id="word-action-hint">اختر ملفًا للبدء</span><button class="primary" id="submit-word" type="submit" disabled><span>شكّل المستند</span></button></div>
+        <p class="help" id="word-help">حتى ٢٠٬٠٠٠ حرف داخل المستند. نحتفظ بالتنسيق والجداول والصور. لملفات .doc القديمة، احفظ نسخة بصيغة .docx أولًا.</p>
+      </div>
+      <div class="document-guidance word-result" id="word-result" aria-busy="false">
+        <div class="word-result-heading"><span>المستند المشكّل</span><span id="word-badge" class="state-badge">بانتظار الملف</span></div>
+        <div class="word-state-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path id="word-state-symbol" d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></svg><span class="word-spinner"></span></div>
+        <div role="status" aria-live="polite" aria-atomic="true"><h2 id="word-state-title">نتيجتك ستظهر هنا</h2><p class="help" id="word-state-help">اختر مستندك، ثم اضغط «شكّل المستند». سيظهر رابط التحميل هنا عند اكتمال التشكيل.</p></div>
+        <bdi id="word-result-name" class="result-filename" hidden></bdi>
+        <a id="download-word" class="download" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M5 16v4h14v-4"/></svg>تحميل المستند المشكّل</a>
+        <p class="document-review">التشكيل آلي وقد يخطئ؛ راجع المستند بعد تحميله.</p>
+      </div>
     </form>
   </section>
   <div class="feedback"><p id="status" role="status" aria-live="polite"></p><p id="error" role="alert" hidden></p></div>
