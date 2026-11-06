@@ -128,14 +128,22 @@ def test_jais_word_recovery_never_copies_changed_letters():
     assert result == local
 
 
-def test_jais_opt_in_document_preserves_runs_and_binary_parts(monkeypatch):
+def test_jais_word_batches_paragraphs_and_preserves_runs_and_binary_parts(monkeypatch):
     from app import jais
 
     monkeypatch.setenv('IFM_API_KEY', 'test-key')
-    monkeypatch.setattr(jais, 'predict', lambda text, *_: mark(text))
+    batches = []
+    def predict_batch(texts, key):
+        batches.append(texts)
+        return [mark(text) for text in texts]
+    monkeypatch.setattr(jais, 'predict_word_batch', predict_batch)
     with TestClient(app) as client:
-        result = client.post('/api/document', files={'file': ('arabic.docx', make_docx())},
-                             headers={'X-Tashkeel-Mode': 'jais'})
+        files = {'file': ('arabic.docx', make_docx())}
+        local = client.post('/api/document', files=files)
+        assert local.headers['X-Tashkeel-Engine'] == 'rawi'
+        assert not batches
+        result = client.post('/api/document', files=files, headers={'X-Tashkeel-Mode': 'jais'})
+        assert batches == [['اللغة العربية', 'جميلة']]
         assert result.status_code == 200
         assert result.headers['X-Tashkeel-Engine'] == 'jais'
         with ZipFile(BytesIO(result.content)) as docx:
@@ -143,3 +151,29 @@ def test_jais_opt_in_document_preserves_runs_and_binary_parts(monkeypatch):
             assert ''.join(root.itertext()) == mark('اللغة العربيةجميلة')
             assert len(list(root.iter(W + 'r'))) == 3
             assert docx.read('word/media/image.png') == b'unchanged-image'
+
+
+
+def test_word_uses_rawi_only_for_unavailable_jais_batches(monkeypatch):
+    from app import jais
+
+    monkeypatch.setenv('IFM_API_KEY', 'test-key')
+    monkeypatch.setattr(jais, 'WORD_BATCH_ITEMS', 1)
+    def predict_batch(texts, key):
+        # A spelling change in a successful batch must preserve the source.
+        return ['لغة أخرى'] if texts == ['اللغة العربية'] else [None]
+    monkeypatch.setattr(jais, 'predict_word_batch', predict_batch)
+    fallbacks = []
+    def fallback(text):
+        fallbacks.append(text)
+        return mark(text)
+    monkeypatch.setattr(jais, 'complete_text', fallback)
+    with TestClient(app) as client:
+        result = client.post('/api/document', files={'file': ('arabic.docx', make_docx())},
+                             headers={'X-Tashkeel-Mode': 'jais'})
+        assert result.status_code == 200
+        assert result.headers['X-Tashkeel-Engine'] == 'jais+rawi'
+        assert fallbacks == ['جميلة']
+        with ZipFile(BytesIO(result.content)) as docx:
+            root = etree.fromstring(docx.read('word/document.xml'))
+            assert ''.join(root.itertext()) == 'اللغة العربية' + mark('جميلة')

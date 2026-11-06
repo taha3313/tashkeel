@@ -42,7 +42,7 @@ def vocalize(text, complete):
     return ''.join(complete(piece) if ARABIC.search(piece) else piece for piece in chunks(text))
 
 
-def process_docx(data, complete):
+def process_docx(data, complete, *, complete_many=None):
     if len(data) > MAX_FILE:
         raise ValueError('الحد الأقصى لحجم الملف ٥ ميغابايت.')
     try:
@@ -79,8 +79,10 @@ def process_docx(data, complete):
                     groups.append((nodes, text))
         if not groups:
             raise ValueError('لم نعثر على نص عربي في المستند.')
-        for nodes, text in groups:
-            result = split_marks(vocalize(text, complete))
+        texts = [text for _, text in groups]
+        results = complete_many(texts) if complete_many else (vocalize(text, complete) for text in texts)
+        for (nodes, text), output in zip(groups, results, strict=True):
+            result = split_marks(output)
             original = split_marks(text)
             if [c for c, _ in result] != [c for c, _ in original]:
                 raise ValueError('تعذّر الحفاظ على النص الأصلي. لم يتم إنشاء ملف معدّل.')

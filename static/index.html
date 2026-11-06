@@ -31,9 +31,9 @@
     <button id="text-tab" type="button" aria-pressed="true" aria-controls="text-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M12 5v14M8 19h8"/></svg>كتابة نص</button>
     <button id="word-tab" type="button" aria-pressed="false" aria-controls="word-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 12h6M9 16h6"/></svg>مستند Word</button>
   </nav>
-  <p class="help">
+  <p class="help" id="text-jais-option">
     <label><input id="jais-mode" type="checkbox" aria-describedby="jais-help"> استخدام نموذج <bdi dir="ltr">Jais 3</bdi> لتحسين التشكيل</label>
-    <span id="jais-help">عند تفعيله، يُرسل نصّك إلى خدمة <bdi dir="ltr">IFM</bdi> للتشكيل. في مستندات Word، يُرسل النص المستخرج فقط. تُستخدم خدمة التشكيل المحلية عند تعذّر الاتصال.</span>
+    <span id="jais-help">عند تفعيله، يُرسل نصّك إلى خدمة <bdi dir="ltr">IFM</bdi> للتشكيل. تُستخدم خدمة التشكيل المحلية عند تعذّر الاتصال.</span>
   </p>
   <section id="text-panel" class="workbench" aria-labelledby="text-tab" data-state="empty">
     <form id="text-form" class="input-pane">
@@ -70,6 +70,7 @@
         </label>
         <div class="selected-file" id="selected-file" hidden><span class="file-tag" dir="ltr">DOCX</span><div><bdi id="filename">لم يتم اختيار ملف</bdi><span id="file-size"></span></div><span class="selection-note">تم اختيار الملف</span></div>
         <div class="toolbar word-toolbar"><span id="word-action-hint">اختر ملفًا للبدء</span><button class="primary" id="submit-word" type="submit" disabled><span>شكّل المستند</span></button></div>
+        <p class="help">يُرسَل النص المستخرج من المستند إلى <bdi dir="ltr">IFM</bdi> لتشكيله باستخدام <bdi dir="ltr">Jais 3</bdi>. يُستخدم <bdi dir="ltr">Rawi</bdi> عند تعذّر الحصول على نتيجة من الخدمة.</p>
         <p class="help" id="word-help">حتى ٢٠٬٠٠٠ حرف داخل المستند. نحتفظ بالتنسيق والجداول والصور. لملفات .doc القديمة، احفظ نسخة بصيغة .docx أولًا.</p>
       </div>
       <div class="document-guidance word-result" id="word-result" aria-busy="false">
