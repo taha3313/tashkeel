@@ -90,3 +90,56 @@ def test_mixed_script_chunks_respect_model_token_budget():
                   if unicodedata.category(c) != 'Mn']
         assert len(tokens) <= MAX_INPUT_TOKENS
         assert [c for c, _ in split_marks(complete_text(part))] == [c for c, _ in split_marks(part)]
+
+
+def test_jais_opt_in_recovers_whitespace_and_uses_rawi_on_failure(monkeypatch):
+    from app import jais
+
+    monkeypatch.setenv('IFM_API_KEY', 'test-key')
+    calls = []
+    def predict(text, key, timeout):
+        calls.append((text, key, timeout))
+        return 'ذَهَبَ الطَّالِبُ'
+    monkeypatch.setattr(jais, 'predict', predict)
+    with TestClient(app) as client:
+        data = {'text': 'ذَهَب\n\tالطالب'}
+        local = client.post('/api/tashkeel', json=data)
+        assert local.headers['X-Tashkeel-Engine'] == 'rawi'
+        assert not calls
+        selected = {'X-Tashkeel-Mode': 'jais'}
+        remote = client.post('/api/tashkeel', json=data, headers=selected)
+        assert remote.headers['X-Tashkeel-Engine'] == 'jais'
+        assert remote.json()['text'] == 'ذَهَبَ\n\tالطَّالِبُ'
+        assert calls == [(data['text'], 'test-key', jais.CHUNK_TIMEOUT)]
+        monkeypatch.setattr(jais, 'predict', lambda *args: None)
+        failed = client.post('/api/tashkeel', json=data, headers=selected)
+        assert failed.headers['X-Tashkeel-Engine'] == 'rawi'
+        assert failed.json() == local.json()
+
+
+def test_jais_word_recovery_never_copies_changed_letters():
+    from app.jais import recover_harakat
+
+    source = 'هذا الطالب كتب كتابا أمس.'
+    local = 'هَذَا الطَّالِبُ كَتَبَ كِتَابًا أَمْسَ.'
+    prediction = 'هَذَا الطَّالِبُ كَتَبَ كِتَاباً الْيَوْمَ.'
+    result, engine = recover_harakat(source, prediction, lambda _: local)
+    assert engine == 'jais+rawi'
+    assert result == local
+
+
+def test_jais_opt_in_document_preserves_runs_and_binary_parts(monkeypatch):
+    from app import jais
+
+    monkeypatch.setenv('IFM_API_KEY', 'test-key')
+    monkeypatch.setattr(jais, 'predict', lambda text, *_: mark(text))
+    with TestClient(app) as client:
+        result = client.post('/api/document', files={'file': ('arabic.docx', make_docx())},
+                             headers={'X-Tashkeel-Mode': 'jais'})
+        assert result.status_code == 200
+        assert result.headers['X-Tashkeel-Engine'] == 'jais'
+        with ZipFile(BytesIO(result.content)) as docx:
+            root = etree.fromstring(docx.read('word/document.xml'))
+            assert ''.join(root.itertext()) == mark('اللغة العربيةجميلة')
+            assert len(list(root.iter(W + 'r'))) == 3
+            assert docx.read('word/media/image.png') == b'unchanged-image'

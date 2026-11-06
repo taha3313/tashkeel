@@ -31,6 +31,10 @@
     <button id="text-tab" type="button" aria-pressed="true" aria-controls="text-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16M12 5v14M8 19h8"/></svg>كتابة نص</button>
     <button id="word-tab" type="button" aria-pressed="false" aria-controls="word-panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8zM14 3v5h5M9 12h6M9 16h6"/></svg>مستند Word</button>
   </nav>
+  <p class="help">
+    <label><input id="jais-mode" type="checkbox" aria-describedby="jais-help"> استخدام نموذج <bdi dir="ltr">Jais 3</bdi> لتحسين التشكيل</label>
+    <span id="jais-help">عند تفعيله، يُرسل نصّك إلى خدمة <bdi dir="ltr">IFM</bdi> للتشكيل. في مستندات Word، يُرسل النص المستخرج فقط. تُستخدم خدمة التشكيل المحلية عند تعذّر الاتصال.</span>
+  </p>
   <section id="text-panel" class="workbench" aria-labelledby="text-tab" data-state="empty">
     <form id="text-form" class="input-pane">
       <div class="editor-head"><label for="input">النص الأصلي</label><button id="sample" type="button" class="quiet">جرّب مثالًا</button></div>
@@ -81,6 +85,6 @@
   <aside class="notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8v5m0 3v.1"/><circle cx="12" cy="12" r="9"/></svg><p>التشكيل آلي وقد يخطئ؛ راجع النتيجة، خاصةً أواخر الكلمات والأسماء. تُعالج النصوص على الخادم ولا يحفظها التطبيق.</p></aside>
   <noscript>يلزم تفعيل JavaScript لاستخدام أداة التشكيل.</noscript>
 </main>
-<footer class="container colophon"><span>تشكيل، أداة مستقلة من Taha Chelly</span><div><a href="https://github.com/taha3313/tashkeel">المصدر</a><a href="https://huggingface.co/TigreGotico/rawi-ensemble">نموذج <bdi dir="ltr">Rawi Ensemble</bdi></a><a href="/static/model-license.txt">ترخيص النموذج</a></div></footer>
+<footer class="container colophon"><span>تشكيل، أداة مستقلة من Taha Chelly</span><div><a href="https://github.com/taha3313/tashkeel">المصدر</a><a href="https://huggingface.co/TigreGotico/rawi-ensemble">النموذج المحلي <bdi dir="ltr">Rawi Ensemble</bdi></a><a href="/static/model-license.txt">ترخيص النموذج</a></div></footer>
 </body>
 </html>

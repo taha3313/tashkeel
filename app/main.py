@@ -2,12 +2,13 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from io import BytesIO
 from threading import BoundedSemaphore
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Header, HTTPException, Response, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from app.documents import ARABIC, MAX_FILE, MAX_TEXT, process_docx, vocalize
-from app.vocalizer import TashkeelUnavailable, complete_text, get_vocalizer
+from app.jais import JaisRequest
+from app.vocalizer import TashkeelUnavailable, get_vocalizer
 
 STATIC = Path(__file__).resolve().parent.parent / 'static'
 WORK = BoundedSemaphore(1)
@@ -49,29 +50,34 @@ class TextInput(BaseModel):
     text: str = Field(min_length=1, max_length=MAX_TEXT)
 
 @app.post('/api/tashkeel')
-def text(request: TextInput):
+def text(request: TextInput, response: Response, x_tashkeel_mode: str = Header(default='')):
     if not ARABIC.search(request.text):
         raise HTTPException(422, 'أدخل نصًا عربيًا أولًا.')
     if not WORK.acquire(blocking=False):
         raise HTTPException(429, 'الخدمة مشغولة الآن. أعد المحاولة بعد قليل.')
     try:
-        return {'text': vocalize(request.text, complete_text)}
+        engine = JaisRequest(x_tashkeel_mode == 'jais')
+        result = vocalize(request.text, engine.complete)
+        response.headers['X-Tashkeel-Engine'] = engine.engine
+        return {'text': result}
     except TashkeelUnavailable as exc:
         raise HTTPException(503, 'تعذّر تشكيل النص. أعد المحاولة بعد قليل.') from exc
     finally:
         WORK.release()
 
 @app.post('/api/document')
-def document(file: UploadFile = File(...)):
+def document(file: UploadFile = File(...), x_tashkeel_mode: str = Header(default='')):
     if not (file.filename or '').lower().endswith('.docx'):
         raise HTTPException(422, 'نقبل ملفات .docx فقط. احفظ ملف .doc القديم بصيغة .docx أولًا.')
     if not WORK.acquire(blocking=False):
         raise HTTPException(429, 'الخدمة مشغولة الآن. أعد المحاولة بعد قليل.')
     try:
         data = file.file.read(MAX_FILE + 1)
-        result = process_docx(data, complete_text)
+        engine = JaisRequest(x_tashkeel_mode == 'jais')
+        result = process_docx(data, engine.complete)
         return StreamingResponse(BytesIO(result), media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                 headers={'Content-Disposition': 'attachment; filename="tashkeel.docx"'})
+                                 headers={'Content-Disposition': 'attachment; filename="tashkeel.docx"',
+                                          'X-Tashkeel-Engine': engine.engine})
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     except TashkeelUnavailable as exc:
