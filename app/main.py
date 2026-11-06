@@ -7,7 +7,7 @@ from fastapi.responses import FileResponse, StreamingResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from app.documents import ARABIC, MAX_FILE, MAX_TEXT, process_docx, vocalize
-from app.jais import JaisRequest
+from app.jais import JaisRequest, WordCoverageIncomplete
 from app.vocalizer import TashkeelUnavailable, complete_text, get_vocalizer
 
 STATIC = Path(__file__).resolve().parent.parent / 'static'
@@ -80,6 +80,8 @@ def document(file: UploadFile = File(...), x_tashkeel_mode: str = Header(default
                                           'X-Tashkeel-Engine': engine.engine})
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
+    except WordCoverageIncomplete as exc:
+        raise HTTPException(503, 'بقيت كلمات بلا تشكيل. أعد المحاولة لتشكيل المستند كاملًا.') from exc
     except TashkeelUnavailable as exc:
         raise HTTPException(503, 'تعذّر تشكيل المستند. أعد المحاولة بعد قليل.') from exc
     finally:
