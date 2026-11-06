@@ -2,6 +2,12 @@ const $ = id => document.getElementById(id);
 let busy = false;
 let wordUrl;
 const countFormat = new Intl.NumberFormat('ar');
+const engineLabels = new Map([['jais', 'Jais 3'], ['rawi', 'Rawi'], ['jais+rawi', 'Jais 3 + Rawi']]);
+function showEngine(id, response) {
+  const label = engineLabels.get(response.headers.get('X-Tashkeel-Engine'));
+  $(id).querySelector('bdi').textContent = label || '';
+  $(id).hidden = !label;
+}
 function setMode(mode) {
   $('text-panel').hidden = mode !== 'text';
   $('word-panel').hidden = mode !== 'word';
@@ -63,6 +69,7 @@ $('text-form').onsubmit = async event => {
   try {
     const response = await request('/api/tashkeel', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({text: $('input').value}) });
     $('output').value = (await response.json()).text;
+    showEngine('text-engine', response);
     $('result-section').hidden = false; textState('ready');
     $('status').textContent = 'اكتمل التشكيل. يمكنك مراجعة النص وتعديله قبل النسخ أو التحميل.';
     $('output').focus();
@@ -106,6 +113,7 @@ $('document').onchange = () => {
   $('download-word').hidden = true;
   $('download-word').removeAttribute('href');
   $('word-result-name').hidden = true;
+  $('word-engine').hidden = true;
   if (wordUrl) { URL.revokeObjectURL(wordUrl); wordUrl = undefined; }
   $('selected-file').hidden = !file;
   $('filename').textContent = file?.name || 'لم يتم اختيار ملف';
@@ -123,7 +131,7 @@ $('document').onchange = () => {
 };
 $('word-form').onsubmit = async event => {
   event.preventDefault(); if (busy) return;
-  clearMessages(); $('download-word').hidden = true;
+  clearMessages(); $('download-word').hidden = true; $('word-engine').hidden = true;
   const file = $('document').files[0];
   if (!file || !/\.docx$/i.test(file.name)) { $('document').setAttribute('aria-invalid', 'true'); fail(new Error('اختر ملف Word بصيغة .docx.')); return; }
   if (file.size > 5 * 1024 * 1024) { $('document').setAttribute('aria-invalid', 'true'); fail(new Error('الحد الأقصى لحجم الملف ٥ ميغابايت.')); return; }
@@ -139,6 +147,7 @@ $('word-form').onsubmit = async event => {
     $('download-word').hidden = false;
     $('word-result-name').textContent = $('download-word').download;
     $('word-result-name').hidden = false;
+    showEngine('word-engine', response);
     wordState('ready');
     $('download-word').focus();
   } catch (error) { $('status').textContent = ''; wordState('error'); fail(error); }
