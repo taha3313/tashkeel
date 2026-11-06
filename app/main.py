@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from app.documents import ARABIC, MAX_FILE, MAX_TEXT, process_docx, vocalize
 from app.jais import JaisRequest
-from app.vocalizer import TashkeelUnavailable, get_vocalizer
+from app.vocalizer import TashkeelUnavailable, complete_text, get_vocalizer
 
 STATIC = Path(__file__).resolve().parent.parent / 'static'
 WORK = BoundedSemaphore(1)
@@ -74,7 +74,7 @@ def document(file: UploadFile = File(...), x_tashkeel_mode: str = Header(default
     try:
         data = file.file.read(MAX_FILE + 1)
         engine = JaisRequest(x_tashkeel_mode == 'jais')
-        result = process_docx(data, engine.complete)
+        result = process_docx(data, complete_text, complete_many=engine.complete_document)
         return StreamingResponse(BytesIO(result), media_type='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                                  headers={'Content-Disposition': 'attachment; filename="tashkeel.docx"',
                                           'X-Tashkeel-Engine': engine.engine})

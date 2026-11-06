@@ -10,6 +10,7 @@ function showEngine(id, response) {
 }
 function setMode(mode) {
   $('text-panel').hidden = mode !== 'text';
+  $('text-jais-option').hidden = mode !== 'text';
   $('word-panel').hidden = mode !== 'word';
   $('text-tab').setAttribute('aria-pressed', mode === 'text');
   $('word-tab').setAttribute('aria-pressed', mode === 'word');
@@ -51,7 +52,7 @@ async function request(path, options, onReady = () => {}) {
   }
   onReady();
   const headers = new Headers(options.headers);
-  if ($('jais-mode').checked) headers.set('X-Tashkeel-Mode', 'jais');
+  if (path === '/api/document' || $('jais-mode').checked) headers.set('X-Tashkeel-Mode', 'jais');
   const response = await fetch(path, { ...options, headers, signal });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
