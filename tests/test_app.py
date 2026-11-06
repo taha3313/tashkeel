@@ -163,6 +163,7 @@ def test_word_uses_rawi_only_for_unavailable_jais_batches(monkeypatch):
         # A spelling change in a successful batch must preserve the source.
         return ['لغة أخرى'] if texts == ['اللغة العربية'] else [None]
     monkeypatch.setattr(jais, 'predict_word_batch', predict_batch)
+    monkeypatch.setattr(jais, 'request_completion', lambda *_: '{"words":{"0":"اَلَلَغَةَ","1":"اَلَعَرَبَيَةَ"}}')
     fallbacks = []
     def fallback(text):
         fallbacks.append(text)
@@ -176,4 +177,57 @@ def test_word_uses_rawi_only_for_unavailable_jais_batches(monkeypatch):
         assert fallbacks == ['جميلة']
         with ZipFile(BytesIO(result.content)) as docx:
             root = etree.fromstring(docx.read('word/document.xml'))
-            assert ''.join(root.itertext()) == 'اللغة العربية' + mark('جميلة')
+            assert ''.join(root.itertext()) == mark('اللغة العربيةجميلة')
+
+
+
+def test_word_repairs_skipped_word_with_jais_without_replacing_existing_marks(monkeypatch):
+    import json
+    from unicodedata import normalize
+    from app import jais
+
+    monkeypatch.setenv('IFM_API_KEY', 'test-key')
+    monkeypatch.setattr(jais, 'predict_word_batch', lambda texts, _: ['دلفين بَطَّةٌ'])
+    def repair(payload, key, timeout):
+        context = json.loads(payload['messages'][1]['content'])
+        assert context['targets'] == {'0': 'دلفين'}
+        assert normalize('NFC', context['paragraphs'][0]) == normalize('NFC', '[0]دلفين بَطَّةٌ')
+        return '{"words":{"0":"دُلْفِينٌ"}}'
+    monkeypatch.setattr(jais, 'request_completion', repair)
+    source = 'دلفين بَطّة'
+    xml = f'<w:document xmlns:w="{W[1:-1]}"><w:body><w:p><w:r><w:t>{source}</w:t></w:r></w:p></w:body></w:document>'
+    with TestClient(app) as client:
+        result = client.post('/api/document', files={'file': ('arabic.docx', make_docx(xml))},
+                             headers={'X-Tashkeel-Mode': 'jais'})
+        assert result.status_code == 200
+        assert result.headers['X-Tashkeel-Engine'] == 'jais'
+        with ZipFile(BytesIO(result.content)) as docx:
+            root = etree.fromstring(docx.read('word/document.xml'))
+            assert normalize('NFC', ''.join(root.itertext())) == normalize('NFC', 'دُلْفِينٌ بَطَّةٌ')
+
+
+def test_word_rejects_incomplete_jais_document_without_silent_rawi_override(monkeypatch):
+    from app import jais
+
+    monkeypatch.setenv('IFM_API_KEY', 'test-key')
+    monkeypatch.setattr(jais, 'predict_word_batch', lambda texts, _: texts)
+    monkeypatch.setattr(jais, 'request_completion', lambda *_: '{"words":{}}')
+    def reject_rawi(_):
+        pytest.fail('Rawi must not replace a successful Jais response')
+    monkeypatch.setattr(jais, 'complete_text', reject_rawi)
+    with TestClient(app) as client:
+        result = client.post('/api/document', files={'file': ('arabic.docx', make_docx())},
+                             headers={'X-Tashkeel-Mode': 'jais'})
+        assert result.status_code == 503
+        assert 'بقيت كلمات بلا تشكيل' in result.json()['detail']
+
+
+
+def test_word_repair_preserves_variant_spelling():
+    from app.jais import project_word_marks, split_marks
+
+    source = 'بالأوكسيجين'
+    marked = ''.join(project_word_marks(split_marks(source), 'بِالْأُكْسُجِينِ'))
+    assert ''.join(char for char, _ in split_marks(marked)) == source
+    assert marked.startswith('بِالْأُ') and marked.endswith('نِ')
+    assert not project_word_marks(split_marks(source), 'الدُّلْفِينُ')
