@@ -23,7 +23,7 @@ function fail(error) {
 function textState(state) { $('text-panel').dataset.state = state; document.querySelector('.result-pane')?.setAttribute('aria-busy', String(state === 'loading')); }
 function setBusy(value) {
   busy = value;
-  for (const id of ['submit-text', 'submit-word', 'sample', 'input', 'document', 'text-tab', 'word-tab']) $(id).disabled = value;
+  for (const id of ['submit-text', 'submit-word', 'sample', 'input', 'document', 'text-tab', 'word-tab', 'jais-mode']) $(id).disabled = value;
   $('submit-word').setAttribute('aria-busy', value && !$('word-panel').hidden);
   $('submit-text').setAttribute('aria-busy', value && !$('text-panel').hidden);
   $('submit-text').querySelector('span').textContent = value && !$('text-panel').hidden ? 'جارٍ التشكيل…' : 'شكّل النص';
@@ -44,7 +44,9 @@ async function request(path, options, onReady = () => {}) {
     await new Promise(resolve => setTimeout(resolve, 3000));
   }
   onReady();
-  const response = await fetch(path, { ...options, signal });
+  const headers = new Headers(options.headers);
+  if ($('jais-mode').checked) headers.set('X-Tashkeel-Mode', 'jais');
+  const response = await fetch(path, { ...options, headers, signal });
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     throw new Error(typeof body?.detail === 'string' ? body.detail : 'تعذّر إكمال الطلب. راجع حجم النص أو الملف وأعد المحاولة.');
