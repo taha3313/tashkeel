@@ -1,0 +1,170 @@
+[
+  {
+    "id": "diagnostic-inna",
+    "input": "إن اللغة العربية جميلة.",
+    "expected": "إِنَّ اللُّغَةَ الْعَرَبِيَّةَ جَمِيلَةٌ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-kana",
+    "input": "كان الجو جميلا.",
+    "expected": "كَانَ الْجَوُّ جَمِيلًا.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-preposition",
+    "input": "ذهب الطفل إلى المدرسة.",
+    "expected": "ذَهَبَ الطِّفْلُ إِلَى الْمَدْرَسَةِ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-lan",
+    "input": "لن يهمل الطالب واجبه.",
+    "expected": "لَنْ يُهْمِلَ الطَّالِبُ وَاجِبَهُ.",
+    "categories": [
+      "grammar_diagnostic"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-idafa",
+    "input": "قرأ الطالب كتاب المعلم.",
+    "expected": "قَرَأَ الطَّالِبُ كِتَابَ الْمُعَلِّمِ.",
+    "categories": [
+      "grammar_diagnostic"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-adjective",
+    "input": "مر الطفل برجل كريم.",
+    "expected": "مَرَّ الطِّفْلُ بِرَجُلٍ كَرِيمٍ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-nominal",
+    "input": "هذه مدرسة جميلة.",
+    "expected": "هَذِهِ مَدْرَسَةٌ جَمِيلَةٌ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-prohibition",
+    "input": "لا تهمل دروسك.",
+    "expected": "لَا تُهْمِلْ دُرُوسَكَ.",
+    "categories": [
+      "grammar_diagnostic"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-dual",
+    "input": "حضر الطالبان إلى المدرسة.",
+    "expected": "حَضَرَ الطَّالِبَانِ إِلَى الْمَدْرَسَةِ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-inna_plural",
+    "input": "إن المعلمين مخلصون.",
+    "expected": "إِنَّ الْمُعَلِّمِينَ مُخْلِصُونَ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-numbers",
+    "input": "في الحقيبة ثلاثة كتب.",
+    "expected": "فِي الْحَقِيبَةِ ثَلَاثَةُ كُتُبٍ.",
+    "categories": [
+      "grammar_diagnostic"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  },
+  {
+    "id": "diagnostic-relative",
+    "input": "هذا هو الكتاب الذي قرأه المعلم.",
+    "expected": "هَذَا هُوَ الْكِتَابُ الَّذِي قَرَأَهُ الْمُعَلِّمُ.",
+    "categories": [
+      "correct_control"
+    ],
+    "source": {
+      "kind": "original_example",
+      "author": "assistant",
+      "license": "original task-authored diagnostic; no independent human review"
+    },
+    "training_allowed": true
+  }
+]

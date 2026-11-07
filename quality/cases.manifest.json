@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "selection": "error-set-v1; hash-ranked per source; first reference mismatches",
+  "selection_bias": "failure-enriched challenge set, not a general accuracy benchmark",
+  "source_sha256": "688ad021e0475f4a1e1016dbadd54520d2efb848ce9c89bc0e01bbd4ab9fc875",
+  "dataset_sha256": "ae7f16106c60115be5c9538cf732abe499d9baad2c29e2b2604257e3959d5c3b",
+  "samples": 162,
+  "splits": {
+    "development": 126,
+    "validation": 17,
+    "test": 19
+  },
+  "excluded_groups": 217,
+  "reviewed_cases": 0,
+  "baseline_model_sha256": "3add2657fd5aa9bd0cda9943fef7f3f74a29324f3e7f07ad353f01d6d0e56dfc",
+  "failure_cases": 154,
+  "correct_controls": 8,
+  "baseline_commit": "c237519a5df09020a1dbee0704119488a2cb1800",
+  "baseline_code_sha256": {
+    "app/vocalizer.py": "b16f4b67a7c91413b6aa6d3f4c1b6b71e380105710db869f458c285ef6fb488b",
+    "app/documents.py": "3f02dfc15d85682ed959d9612c9e7f55ddb06701ff9465fa7f98895e66813892"
+  }
+}
